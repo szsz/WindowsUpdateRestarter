@@ -52,6 +52,8 @@ namespace WindowsUpdateRestarter
         static DateTime timeAcceptedNotification = DateTime.MinValue;
         static DateTime remindTime = DateTime.MinValue;
 
+        // this should be min value if there is currently no notification displayed
+        static DateTime notificationDisplayedTime = DateTime.MinValue;
 
 
         static void Main(string[] args)
@@ -74,6 +76,11 @@ namespace WindowsUpdateRestarter
                         remindTime = DateTime.Now;
                 }
             };
+
+            n.Closed += (Notification x) =>
+                {
+                    notificationDisplayedTime = DateTime.MinValue;
+                };
 
 
             while (true)
@@ -104,7 +111,11 @@ namespace WindowsUpdateRestarter
                             }
                             else
                             {
-                                n.ShowToast();
+                                if ((cur - notificationDisplayedTime).TotalHours > 12)
+                                {
+                                    notificationDisplayedTime = DateTime.Now;
+                                    n.ShowToast();
+                                }
                             }
                         }
                         else

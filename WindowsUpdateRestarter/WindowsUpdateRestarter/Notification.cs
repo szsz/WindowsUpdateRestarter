@@ -109,12 +109,17 @@ namespace WindowsUpdateRestarter
 
         public event Action<Notification, string> Activated;
 
+        public event Action<Notification> Closed;
+
         private void ToastActivated(ToastNotification sender, object e)
         {
             Console.WriteLine("The user activated the toast.");
             var a = Activated;
             if (a != null && e != null && e is Windows.UI.Notifications.ToastActivatedEventArgs)
                 a(this, ((Windows.UI.Notifications.ToastActivatedEventArgs)e).Arguments);
+            var c = Closed;
+            if (c != null)
+                c(this);
 
         }
 
@@ -134,11 +139,22 @@ namespace WindowsUpdateRestarter
                     break;
             }
 
+
+            var c = Closed;
+            if (c != null)
+                c(this);
+
             Console.WriteLine(outputText);
         }
 
         private void ToastFailed(ToastNotification sender, ToastFailedEventArgs e)
         {
+
+            var c = Closed;
+            if (c != null)
+                c(this);
+
+
             Console.WriteLine("error");
         }
     }
