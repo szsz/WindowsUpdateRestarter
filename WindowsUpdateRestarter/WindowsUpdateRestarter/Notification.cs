@@ -15,11 +15,22 @@ using ShellHelpers;
 
 namespace WindowsUpdateRestarter
 {
-    class Notification
+    public class Notification
     {
-
-        public Notification(string[] message, Tuple<string, string>[] buttons)
+        public enum Scenario
         {
+            reminder,
+            Default,
+            alarm,
+            incomingCall
+
+        };
+
+        Scenario scen;
+
+        public Notification(string[] message, Tuple<string, string>[] buttons, Scenario s = Scenario.Default)
+        {
+            this.scen = s;
             TryCreateShortcut();
             this.message = message;
             if (message.Length != 2)
@@ -88,12 +99,12 @@ namespace WindowsUpdateRestarter
                 actions += string.Format("<action content=\"{0}\" arguments=\"{1}\"/>", item.Item1, item.Item2);
             }
 
-            string s = String.Format("<toast scenario=\"reminder\">"
+            string s = String.Format("<toast scenario=\"{4}\">"
                 + "<visual><binding template=\"ToastGeneric\">"
                 + "<image placement=\"AppLogoOverride\" src=\"{0}\"/>"
                 + " <text>{1}</text><text>{2}</text></binding></visual>"
                 + " <actions>{3}</actions>"
-                + "</toast>", imagePath, message[0], message[1], actions);
+                + "</toast>", imagePath, message[0], message[1], actions, scen);
 
             // Create the toast and attach event listeners
             XmlDocument toastXml = new XmlDocument(); toastXml.LoadXml(s);

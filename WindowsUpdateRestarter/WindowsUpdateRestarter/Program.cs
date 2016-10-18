@@ -15,7 +15,9 @@ namespace WindowsUpdateRestarter
 
         static Notification restart = new Notification(new string[] {
                 "Restarting Windows",
-                "Run \"shutdown /a\" within 5 minutes to cancel."}, new Tuple<string, string>[] { });
+                "Run \"shutdown /a\" within 5 minutes to cancel."}, new Tuple<string, string>[] {
+                    new Tuple<string, string>("OK", "OK")
+                }, Notification.Scenario.reminder);
         static void Restart()
         {
             Console.WriteLine("Restarting");
@@ -29,11 +31,14 @@ namespace WindowsUpdateRestarter
             Thread.Sleep(1000 * 15);
             restart.ShowToast();
 
-            Thread.Sleep(1000 * 60 * 10);
+            Thread.Sleep(1000 * 15);
+
+            Environment.Exit(0);
         }
 
         static bool NeedsResstart()
         {
+
             bool req = false;
             RegistryKey localKey =
                 RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine,
@@ -43,6 +48,9 @@ namespace WindowsUpdateRestarter
             {
                 req = true;
             }
+#if DEBUG
+            req = true;
+#endif
             return req;
         }
 
@@ -63,15 +71,24 @@ namespace WindowsUpdateRestarter
                 "Restart Windows",
                 "Windows update will automatically restart your machine." },
                 new Tuple<string, string>[] {
-                    new Tuple<string, string>("Restart At 2AM", "Restart"), 
-                    new Tuple<string, string>("Remind me in 1 hour", "Remind") 
+                    new Tuple<string, string>("Restart at 2 a.m.", "Restart"),
+                    new Tuple<string, string>("Remind me in 1 hour", "Remind")
+                }, Notification.Scenario.reminder);
+            Notification ack = new Notification(new string[] {
+                "Windows Will Restart",
+                "Windows update will automatically restart your machine at 2 a.m." },
+                new Tuple<string, string>[] {
+                    new Tuple<string, string>("OK", "OK")
                 });
             n.Activated += (Notification x, string e) =>
             {
                 if (e != null)
                 {
                     if (e == "Restart")
+                    {
                         timeAcceptedNotification = DateTime.Now;
+                        ack.ShowToast();
+                    }
                     if (e == "Remind")
                         remindTime = DateTime.Now;
                 }
@@ -120,6 +137,9 @@ namespace WindowsUpdateRestarter
                         }
                         else
                         {
+#if DEBUG
+                            Restart();
+#endif
                             if (cur.Hour == 2 && (cur - timeAcceptedNotification).TotalHours > 1)
                             {
                                 Restart();
@@ -128,8 +148,11 @@ namespace WindowsUpdateRestarter
                     }
                 }
 
-
-                Thread.Sleep(1000 * 60 * 10);
+                int sleepTime = 1000 * 60 * 10; // 10 minutes
+#if DEBUG
+                sleepTime = 1000 * 10; // 10 seconds
+#endif
+                Thread.Sleep(sleepTime);
 
             }
 
