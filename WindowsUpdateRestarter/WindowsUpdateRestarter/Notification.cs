@@ -39,7 +39,7 @@ namespace WindowsUpdateRestarter
         public void ShowToast()
         {
             // Specify the absolute path to an image
-            String imagePath = "file:///" + Path.GetFullPath("Restart.png");
+            String imagePath = "file:///" + AppDomain.CurrentDomain.BaseDirectory.Replace(@"\", "/") + "Restart.png";
 
             string actions = "";
             foreach (Tuple<string, string> item in buttons)

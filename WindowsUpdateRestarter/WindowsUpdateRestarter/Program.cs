@@ -50,7 +50,7 @@ namespace WindowsUpdateRestarter
                     req = true;
                 }
 #if DEBUG
-            req = true;
+                req = true;
 #endif
                 return req;
             }
@@ -118,7 +118,7 @@ namespace WindowsUpdateRestarter
 #if DEBUG
                         if ((cur - userAskedRemindTime).TotalSeconds > 1) // notification not shown yet or user asked to remind him/her in 1 hour which elapsed
 #else
-                    if ((cur - userAskedRemindTime).TotalHours > 1) // notification not shown yet or user asked to remind him/her in 1 hour which elapsed
+                        if ((cur - userAskedRemindTime).TotalHours > 1) // notification not shown yet or user asked to remind him/her in 1 hour which elapsed
 #endif
                         {
                             if (detectedRestartNeededTime == DateTime.MinValue) // we did not detect the need of restart yet
