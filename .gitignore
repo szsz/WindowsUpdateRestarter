@@ -49,4 +49,4 @@ obj/
 # packages
 packages/
 
-**/.vs/
+.vs/
